@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>MultiSweeper</title>
+</head>
+
+<body>
+  <script src="wasm_exec.js"></script>
+  <script>
+    (async () => {
+      function loadWasm() {
+        const go = new Go();
+        go.argv.push('--mode=client');
+        if (!WebAssembly.instantiateStreaming) {
+          WebAssembly.instantiateStreaming = async (resp, importObject) => {
+            const source = await (await resp).arrayBuffer();
+            return await WebAssembly.instantiate(source, importObject);
+          }
+        }
+
+        WebAssembly.instantiateStreaming(fetch('game.wasm'), go.importObject)
+          .then((result) => {
+            go.run(result.instance);
+          }).catch(error => {
+            throw error;
+          });
+      }
+
+      try {
+        loadWasm();
+      } catch (exception) {
+        console.error(exception);
+      }
+    })();
+  </script>
+</body>
+
+</html>
