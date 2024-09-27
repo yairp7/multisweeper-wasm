@@ -13,6 +13,8 @@
       function loadWasm() {
         const go = new Go();
         go.argv.push('--mode=client');
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('host')) go.argv.push(`--host=${urlParams.get('host')}`);
         if (!WebAssembly.instantiateStreaming) {
           WebAssembly.instantiateStreaming = async (resp, importObject) => {
             const source = await (await resp).arrayBuffer();
